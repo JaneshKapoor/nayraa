@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import Constants from 'expo-constants';
+const apiKey = Constants.expoConfig.extra.GOOGLE_MAPS_API_KEY;
 import {
   StyleSheet,
   View,
@@ -7,6 +9,7 @@ import {
   Alert,
   Dimensions,
   Keyboard,
+  TouchableOpacity,
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -24,6 +27,9 @@ export default function App() {
   const [marker, setMarker] = useState(null);
   const [summary, setSummary] = useState('Search for a location to see details');
   const [errorMsg, setErrorMsg] = useState(null);
+
+  // New state to track user role
+  const [userRole, setUserRole] = useState('none'); // 'user' or 'technician'
 
   useEffect(() => {
     (async () => {
@@ -53,7 +59,7 @@ export default function App() {
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
           searchText
-        )}&key=AIzaSyAGtxW7uVRYwkXFeCso229FHhLJCsbaB9s`
+        )}&key=${apiKey}`
       );
 
       const data = await response.json();
@@ -86,11 +92,29 @@ export default function App() {
   };
 
   const handleMapRegionChange = (newRegion) => {
-    setRegion(newRegion);
+    // Check if the new region is different from the current region
+    // We want to prevent resetting during user-initiated rotation
+    if (newRegion.latitude !== region.latitude || newRegion.longitude !== region.longitude) {
+      setRegion(newRegion); // Update the region only if it's different
+    }
+  };
+
+  // Handle button press for switching roles
+  const handleUserRoleChange = (role) => {
+    setUserRole(role);
+    // Reset other states if needed
+    setSearchText('');
+    setSummary('Search for a location to see details');
+    setMarker(null);
   };
 
   return (
     <View style={styles.container}>
+      {/* App Title */}
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>Nyra</Text>
+      </View>
+
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <TextInput
@@ -109,6 +133,7 @@ export default function App() {
           style={styles.map}
           region={region}
           onRegionChangeComplete={handleMapRegionChange}
+          rotateEnabled={true} // Keep map rotation enabled
         >
           {marker && <Marker coordinate={marker} />}
         </MapView>
@@ -119,6 +144,28 @@ export default function App() {
         <Text style={styles.summaryTitle}>Location Summary</Text>
         <Text style={styles.summaryText}>{summary}</Text>
       </View>
+
+      {/* Role Selection Buttons */}
+      <View style={styles.roleButtonsContainer}>
+        <TouchableOpacity
+          style={[
+            styles.roleButton,
+            userRole === 'user' && styles.activeRoleButton,
+          ]}
+          onPress={() => handleUserRoleChange('user')}
+        >
+          <Text style={styles.roleButtonText}>User</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.roleButton,
+            userRole === 'technician' && styles.activeRoleButton,
+          ]}
+          onPress={() => handleUserRoleChange('technician')}
+        >
+          <Text style={styles.roleButtonText}>Technician</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -127,6 +174,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  titleContainer: {
+    alignItems: 'center',
+    backgroundColor: '#f8f8f8',
+    marginTop: 25, // Keep as is
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginTop: 10,
   },
   searchContainer: {
     padding: 15,
@@ -172,5 +230,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: '#666',
+  },
+  roleButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginHorizontal: 20,
+    marginBottom: 20,
+  },
+  roleButton: {
+    backgroundColor: '#ccc',
+    padding: 10,
+    borderRadius: 5,
+    width: '40%',
+    alignItems: 'center',
+  },
+  activeRoleButton: {
+    backgroundColor: '#007bff',
+  },
+  roleButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

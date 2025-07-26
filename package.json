@@ -10,7 +10,9 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "dotenv": "^17.2.1",
     "expo": "~53.0.20",
+    "expo-constants": "~17.1.7",
     "expo-location": "~18.1.6",
     "expo-permissions": "^14.4.0",
     "expo-status-bar": "~2.2.3",
