@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "661473703016",
+    "project_id": "nyra-16aba",
+    "storage_bucket": "nyra-16aba.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:661473703016:android:482d966bbd2f0d54a337dd",
+        "android_client_info": {
+          "package_name": "com.janesh.nayraa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCS46G-iDlb82FdFxo3LYO_g-OLzO-nnaQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
